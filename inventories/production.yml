@@ -1,0 +1,7 @@
+all:
+  hosts:
+    web01:
+      ansible_host: 172.16.25.193
+  vars:
+    ansible_user: ansible
+

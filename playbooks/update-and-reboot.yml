@@ -1,0 +1,13 @@
+---
+- name: Update packages and reboot
+  hosts: all
+  become: true
+  tasks:
+    - name: Update all packages
+      ansible.builtin.yum:
+        name: '*'
+        state: latest
+
+    - name: Reboot the machine
+      ansible.builtin.reboot:
+        reboot_timeout: 600
