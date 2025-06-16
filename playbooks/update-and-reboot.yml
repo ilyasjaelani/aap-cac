@@ -1,6 +1,6 @@
 ---
 - name: Update packages and reboot
-  hosts: all
+  hosts: web01
   become: true
   tasks:
     - name: Update all packages
