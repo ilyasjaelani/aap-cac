@@ -1,0 +1,2 @@
+- import_playbook: playbooks/update-and-reboot.yml
+
