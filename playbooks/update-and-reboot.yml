@@ -4,7 +4,7 @@
   become: true
   tasks:
     - name: Update all packages
-      ansible.builtin.yum:
+      ansible.builtin.apt:
         name: '*'
         state: latest
 
