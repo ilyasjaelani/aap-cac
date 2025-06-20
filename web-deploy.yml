@@ -1,0 +1,33 @@
+- name: Web Server Deployment
+  hosts: all
+  become: true
+  vars:
+    web_server_choice: "nginx"   # Ganti jadi "nginx" kalau mau Nginx
+
+  tasks:
+    - name: Install Apache if selected
+      package:
+        name: httpd
+        state: present
+      when: web_server_choice == "apache"
+
+    - name: Install Nginx if selected
+      package:
+        name: nginx
+        state: present
+      when: web_server_choice == "nginx"
+
+    - name: Ensure Apache is running (if installed)
+      service:
+        name: httpd
+        state: started
+        enabled: yes
+      when: web_server_choice == "apache"
+
+    - name: Ensure Nginx is running (if installed)
+      service:
+        name: nginx
+        state: started
+        enabled: yes
+      when: web_server_choice == "nginx"
+
