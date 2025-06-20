@@ -1,0 +1,7 @@
+- hosts: web-apache
+  become: true
+  tasks:
+    - name: Install Apache
+      package:
+        name: httpd
+        state: present

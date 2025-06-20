@@ -1,0 +1,9 @@
+all:
+  hosts:
+    web-apache:
+      ansible_host: 172.16.25.87
+    web-nginx:
+      ansible_host: 172.16.25.138
+  vars:
+    ansible_user: lupus
+
