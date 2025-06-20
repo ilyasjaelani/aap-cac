@@ -5,3 +5,9 @@
     - name: ping
       ping:
 
+    - name: print ip
+      cmd: "ip a"
+      register: ip
+
+    - debug: var=ip.stdout_lines
+
