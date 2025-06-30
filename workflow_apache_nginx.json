@@ -1,0 +1,25 @@
+{
+  "name": "apache_nginx_workflow",
+  "description": "Workflow untuk Install Apache lalu Approval lalu Install Nginx",
+  "organization": 1,
+  "extra_vars": {},
+  "workflow_nodes": [
+    {
+      "unified_job_template": 101,
+      "identifier": "install_apache",
+      "success_nodes": ["approval_node"]
+    },
+    {
+      "unified_job_template": null,
+      "identifier": "approval_node",
+      "approval_node": true,
+      "success_nodes": ["install_nginx"]
+    },
+    {
+      "unified_job_template": 102,
+      "identifier": "install_nginx",
+      "success_nodes": []
+    }
+  ]
+}
+
