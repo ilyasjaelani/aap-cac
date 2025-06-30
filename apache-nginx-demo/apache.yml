@@ -1,7 +1,14 @@
-- hosts: web-apache
-  become: true
+- name: Install Apache
+  hosts: all
+  become: yes
   tasks:
     - name: Install Apache
       package:
         name: httpd
         state: present
+    - name: Start Apache
+      service:
+        name: httpd
+        state: started
+        enabled: true
+

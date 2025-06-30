@@ -1,8 +1,18 @@
-- hosts: web
-  become: true
+- name: Install Nginx
+  hosts: all
+  become: yes
   tasks:
+    - name: Install EPEL
+      package:
+        name: epel-release
+        state: present
     - name: Install Nginx
       package:
         name: nginx
         state: present
+    - name: Start Nginx
+      service:
+        name: nginx
+        state: started
+        enabled: true
 
