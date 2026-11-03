@@ -10,10 +10,10 @@
         dest: /tmp/vm-list.sh
         mode: '0755'
 
-    - name: Membersihkan format karakter baris (CRLF ke LF)
+    - name: Membersihkan format Windows carriage return (CRLF ke LF)
       shell: sed -i 's/\r$//' /tmp/vm-list.sh
 
-    - name: 2. Jalankan script di node dan simpan ke vm-list.csv
+    - name: 2. Jalankan script di node sebagai ROOT dan simpan ke vm-list.csv
       shell: /bin/bash /tmp/vm-list.sh > /tmp/vm-list.csv
       changed_when: false
 
