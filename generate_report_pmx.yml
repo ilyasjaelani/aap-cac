@@ -1,40 +1,24 @@
 ---
-- name: Kumpulkan Laporan VM dari Semua Node Proxmox
+- name: Kumpulkan Laporan VM Proxmox Menggunakan Script Custom
   hosts: all
   gather_facts: false
   tasks:
 
-    - name: Scan data VM di node Proxmox
-      shell: |
-        for vmid in $(qm list | awk 'NR>1 {print $1}'); do
-            status=$(qm status $vmid | awk '{print $2}')
-            name=$(qm config $vmid | grep -E "^name:" | awk '{print $2}')
-            [ -z "$name" ] && name="No-Name"
-
-            cores=$(qm config $vmid | grep -E "^cores:" | awk '{print $2}')
-            [ -z "$cores" ] && cores=$(qm config $vmid | grep -E "^sockets:" | awk '{print $2}')
-            [ -z "$cores" ] && cores="1"
-
-            ram_mb=$(qm config $vmid | grep -E "^memory:" | awk '{print $2}')
-            [ -z "$ram_mb" ] && ram_mb="0"
-            ram_gb=$((ram_mb / 1024))
-
-            storage=$(qm config $vmid | grep -E "(scsi|sata|virtio|ide)[0-9]:" | grep -o "size=[^,]*" | cut -d= -f2 | tr '\n' ' ')
-            [ -z "$storage" ] && storage="N/A"
-
-            mac=$(qm config $vmid | grep -E "^net[0-9]:" | grep -oE "([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}" | tr '\n' ',' | sed 's/,$//')
-            [ -z "$mac" ] && mac="No-NIC"
-
-            echo "{{ inventory_hostname }},$vmid,$name,$status,${cores}Core,${ram_gb}GB,$storage,$mac"
-        done
-      register: qm_output
+    - name: Salin dan jalankan script vm-list.sh di setiap node Proxmox
+      script: vm-list.sh
+      register: script_output
       changed_when: false
 
     - name: Tampilkan Header CSV
       run_once: true
       debug:
-        msg: "NODE_PROXMOX,VMID,NAMA_VM,STATUS,CPU,RAM,STORAGE,MAC_ADDRESS"
+        msg: "NODE_PROXMOX,VMID,Name,vCPU,RAM(MB),TotalDisk(GB)"
 
     - name: Tampilkan Hasil Data VM
+      vars:
+        # Menghapus baris header pertama bawaan script agar tidak double
+        lines: "{{ script_output.stdout_lines[1:] if script_output.stdout_lines | length > 1 else [] }}"
       debug:
-        msg: "{{ qm_output.stdout_lines }}"
+        msg: "{{ inventory_hostname }},{{ item }}"
+      loop: "{{ lines }}"
+      when: lines | length > 0
