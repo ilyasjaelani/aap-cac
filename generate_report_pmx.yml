@@ -4,17 +4,17 @@
   gather_facts: false
   tasks:
 
-    - name: Jalankan script scanner di setiap node Proxmox
+    - name: Scan data VM di node Proxmox
       shell: |
         qm list | awk 'NR>1 {print $1 "," $3}' | while IFS=, read -r vmid status; do
-            name=$(qm config $vmid | grep "name:" | awk '{print $2}')
+            name=$(qm config $vmid | grep "^name:" | awk '{print $2}')
             [ -z "$name" ] && name="No-Name"
 
-            cores=$(qm config $vmid | grep "cores:" | awk '{print $2}')
-            [ -z "$cores" ] && cores=$(qm config $vmid | grep "sockets:" | awk '{print $2}')
+            cores=$(qm config $vmid | grep "^cores:" | awk '{print $2}')
+            [ -z "$cores" ] && cores=$(qm config $vmid | grep "^sockets:" | awk '{print $2}')
             [ -z "$cores" ] && cores="1"
 
-            ram_mb=$(qm config $vmid | grep "memory:" | awk '{print $2}')
+            ram_mb=$(qm config $vmid | grep "^memory:" | awk '{print $2}')
             [ -z "$ram_mb" ] && ram_mb="0"
             ram_gb=$(echo "scale=1; $ram_mb / 1024" | bc)
 
@@ -29,15 +29,12 @@
       register: qm_output
       changed_when: false
 
-    - name: Tampilkan hasil CSV langsung di Console Output AWX
+    - name: Tampilkan Header CSV
+      run_once: true
       debug:
-        msg: "{{ item }}"
-      with_items: "{{ qm_output.stdout_lines }}"
+        msg: "NODE_PROXMOX,VMID,NAMA_VM,STATUS,CPU,RAM,STORAGE,MAC_ADDRESS"
 
-    - name: Simpan hasil ke file di AWX Runner
-      delegate_to: localhost
-      lineinfile:
-        path: "/tmp/laporan_pve_cluster.csv"
-        line: "{{ item }}"
-        create: yes
-      with_items: "{{ qm_output.stdout_lines }}"
+    - name: Tampilkan Hasil Data VM di Console Output AWX
+      debug:
+        var: qm_output.stdout_lines
+      when: qm_output.stdout_lines is defined and qm_output.stdout_lines | length > 0
