@@ -1,24 +1,24 @@
 ---
-- name: Kumpulkan Laporan VM Proxmox Menggunakan Script Custom
+- name: Eksekusi Laporan VM di Node Proxmox
   hosts: all
   gather_facts: false
   tasks:
 
-    - name: Salin dan jalankan script vm-list.sh di setiap node Proxmox
-      script: vm-list.sh
-      register: script_output
+    - name: 1. Copy file vm-list.sh ke node Proxmox
+      copy:
+        src: vm-list.sh
+        dest: /tmp/vm-list.sh
+        mode: '0755'
+
+    - name: 2. Jalankan script di node dan simpan ke vm-list.csv
+      shell: /tmp/vm-list.sh > /tmp/vm-list.csv
       changed_when: false
 
-    - name: Tampilkan Header CSV
-      run_once: true
-      debug:
-        msg: "NODE_PROXMOX,VMID,Name,vCPU,RAM(MB),TotalDisk(GB)"
+    - name: 3. Cat vm-list.csv agar muncul di output AWX
+      command: cat /tmp/vm-list.csv
+      register: csv_output
+      changed_when: false
 
-    - name: Tampilkan Hasil Data VM
-      vars:
-        # Menghapus baris header pertama bawaan script agar tidak double
-        lines: "{{ script_output.stdout_lines[1:] if script_output.stdout_lines | length > 1 else [] }}"
+    - name: Tampilkan Hasil CSV di Log AWX
       debug:
-        msg: "{{ inventory_hostname }},{{ item }}"
-      loop: "{{ lines }}"
-      when: lines | length > 0
+        msg: "{{ csv_output.stdout_lines }}"
