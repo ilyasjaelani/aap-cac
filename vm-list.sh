@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-# Export Proxmox QEMU VM specs (CPU, RAM, Disk) to CSV
-# Usage: bash export_proxmox_vm_specs.sh > vm-list.csv
+# Tambahkan path Proxmox binary agar terbaca oleh Ansible non-interactive shell
+export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH"
 
+# Export Proxmox QEMU VM specs (CPU, RAM, Disk) to CSV
 set -euo pipefail
 
 # Ensure needed commands exist
