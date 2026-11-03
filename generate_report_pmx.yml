@@ -10,8 +10,11 @@
         dest: /tmp/vm-list.sh
         mode: '0755'
 
+    - name: Membersihkan format karakter baris (CRLF ke LF)
+      shell: sed -i 's/\r$//' /tmp/vm-list.sh
+
     - name: 2. Jalankan script di node dan simpan ke vm-list.csv
-      shell: /tmp/vm-list.sh > /tmp/vm-list.csv
+      shell: /bin/bash /tmp/vm-list.sh > /tmp/vm-list.csv
       changed_when: false
 
     - name: 3. Cat vm-list.csv agar muncul di output AWX
